@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +32,7 @@ namespace WishList.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
+        public IActionResult Register(RegisterViewModel registerViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -46,10 +43,13 @@ namespace WishList.Controllers
                 UserName = registerViewModel.Email,
                 Email = registerViewModel.Email
             };
-            var result = await _userManager.CreateAsync(user);
-            if (! result.Succeeded)
+            //var result = await _userManager.CreateAsync(user);
+
+            Task<IdentityResult> result = _userManager.CreateAsync(user, registerViewModel.Password);
+
+            if (! result.Result.Succeeded)
             {
-                foreach (var error in result.Errors)
+                foreach (var error in result.Result.Errors)
                 {
                     ModelState.AddModelError("Password", error.Description);
                 }
